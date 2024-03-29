@@ -1,0 +1,101 @@
+@page "/Search"
+@inject NavigationManager NavigationManager
+@inject Services.AppData AppData
+
+<style>
+body {
+  background-color: #525252;
+}
+.top-bar {
+    height: 0;
+    width: 100%;
+    background-color: #333; /* Choose your desired color */
+    position: fixed;
+    top: 0;
+    left: 0;
+}
+</style>
+<div class="top-bar"><img src="assets/logo.jpg" style="height: 100%;"></div>
+<h1>Search</h1>
+
+<div class="search-container" style="display: flex; align-items: center; gap: 15px; margin-bottom: 30px;">
+       <select @bind="selectedHobby" size="1" style="flex-grow: 1; height: 40px; border: 1px solid #ced4da; border-radius: 0.25rem; padding: 0.375rem 0.75rem;">
+            <option value="Football">Football</option>
+            <option value="Hockey">Hockey</option>
+            <option value="Snowboarding">Snowboarding</option>
+            <option value="Anime">Anime</option>
+            <option value="GuitarPlaying">Guitar Playing</option>
+            <option value="Startups">Startups</option>
+            <option value="Cooking">Cooking</option>
+            <option value="Fishing">Fishing</option>
+            <option value="BoardGames">Board Games</option>
+            <option value="DungeonsAndDragons">DND</option>
+            <option value="Cars">Cars</option>
+            <option value="HandAndCrafts">Handcrafts</option>
+            <option value="Dancing">Dancing</option>
+            <option value="Hunting">Hunting</option>
+            <option value="Tourism">Tourism</option>
+            <option value="Drawing">Drawing</option>
+            <option value="Music">Music</option>
+            <option value="HobbyHorsing">Hobby Horsing</option>
+            <option value="Blogging">Blogging</option>
+            <option value="Shows">Shows</option>
+            <option value="Movies">Movies</option>
+            <option value="Reading">Reading</option>
+            <option value="GraphicDesign">Graphic Design</option>
+            <option value="Photography">Photography</option>
+            <option value="ElectronicsAndRobotics">Tech</option>
+            <option value="Alcohol">Brewing</option>
+            <option value="Parkour">Parkour</option>
+            <option value="Fencing">Fencing</option>
+            <option value="Yoga">Yoga</option>
+            <option value="HorseRiding">Horse Riding</option>
+        </select>
+<button @onclick="PerformSearch" style="width: 150px; height: 40px; border: none; background-color: #007bff; color: white; border-radius: 0.25rem; cursor: pointer; padding: 0.375rem 0.75rem;">Search</button>
+<button @onclick="GoBackToLK" style="width: 150px; height: 40px; border: none; background-color: #28a745; color: white; border-radius: 0.25rem; cursor: pointer; padding: 0.375rem 0.75rem;">Back</button>
+</div>
+
+@if(foundProfiles != null && foundProfiles.Count > 0)
+{
+    <div style="display: flex; flex-wrap: wrap; gap: 20px;">
+        @foreach(var userProfile in foundProfiles)
+        {
+            <div class="profile-card" style="flex: 0 1 calc(33.333% - 20px); background-color: white; border-radius: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); padding: 20px; text-align: center;">
+                <img src="@($"assets/ICONS/{userProfile.Login}.png")" style="width: 100px; height: 100px; border-radius: 50%; margin-bottom: 20px;">
+                <h2 style="color: black;">@userProfile.Name</h2>
+                <p style="color: black;">Age: @userProfile.Age</p>
+                <p style="color: black;">City: @userProfile.Location</p>
+                <p style="color: black;">Gender: @userProfile.Gender</p>
+                <p style="color: black;">Telegram: <a href="@($"tg://resolve?domain={userProfile.Telegram}")" style="color: #007bff;">@userProfile.Telegram</a></p>
+                <div>
+                    <h3 style="color: black;">Hobbies:</h3>
+                    @foreach (var hobby in userProfile.MainHobbies.Split(","))
+                    {
+                        <span style="display: inline-block; background-color: #f0f0f0; border-radius: 25px; padding: 5px 10px; margin: 5px; color: black;">
+                            @hobby.Replace("ElectronicsAndRobotics", "Tech").Replace("GuitarPlaying", "Guitar Playing").Replace("HobbyHorsing", "Hobby Horsing").Replace("DungeonsAndDragons", "DnD")
+                        </span>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+}
+else if(foundProfiles != null && foundProfiles.Count == 0)
+{
+    <p>No results found.</p>
+}
+
+@code {
+    private List<User> foundProfiles;
+    private string selectedHobby; 
+
+    private async Task PerformSearch()
+    {
+        foundProfiles = (await CsvLoader.ReadData<User>("users.csv")).Where(x => x.MainHobbies.Contains(selectedHobby ?? "Football")).Where(x => x.Login != (AppData.CurrentUser.Login ?? "")).ToList();
+    }
+
+    private void GoBackToLK()
+    {
+        NavigationManager.NavigateTo("/LK");
+    }
+}

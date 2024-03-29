@@ -1,0 +1,92 @@
+@page "/login"
+@inject NavigationManager NavigationManager
+@inject Services.AppData AppData
+
+<div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 90vh;">
+<h1 style="font-family: 'Roboto Mono', sans-serif; font-weight: 700; color: #f2f2f2; font-size: 70px;"><strong>Login</strong></h1>
+    <div style="width: 100%; max-width: 300px;">
+        <input type="text" @bind="login" placeholder="Username" class="login-input" />
+        <input type="password" @bind="password" placeholder="Password" class="login-input" />
+    </div>
+
+    <style>
+        .error {
+            border-color: red;
+        }
+        .error-message {
+           display: flex;
+           align-items: center;
+           white-space: nowrap;
+           color: red;
+           margin-bottom: 10px;
+        }    
+
+        .top-bar 
+          {
+              height: 10%;
+              width: 100%;
+              background-color: #333; /* Choose your desired color */
+              position: fixed;
+              top: 0;
+              left: 0;
+          }
+        body 
+          {
+            background-color: #525252;
+          }
+        .login-input {
+            text-align: center;
+            margin-bottom: 15px;
+            border-radius: 20px;
+            font-size: 150%;
+            border: 5px solid;
+            width: 100%; /* Make input fields fill container */
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+    </style>
+    <div class="top-bar"><img src="assets/logo.jpg" style="height: 100%;"></div>
+    @if (!string.IsNullOrEmpty(errorPassword))
+    {
+        <div class="error-message">
+            <span>@errorPassword</span>
+        </div>
+    }
+    <div>
+        <button @onclick="GoBack" style="border-radius: 90.56px; background-color: #F5E2D8; border-color: white; font-size: 150%; margin-right: 10px;">Back</button>
+        <button @onclick="HandleLogin" style="border-radius: 90.56px; background-color: #F5E2D8; border-color: white; font-size: 150%;">Login</button>
+    </div>
+</div>
+
+@code {
+    private string login;
+    private string password;
+    private string errorPassword;
+
+    private void GoBack()
+    {
+        NavigationManager.NavigateTo("/");
+    }
+
+    private async Task HandleLogin()
+    {
+        var user = await CheckUserExists(login, password);
+
+        if (user != null)
+        {
+            NavigationManager.NavigateTo("/LK");
+            AppData.CurrentUser = user;
+        }
+        else
+        {
+            errorPassword = "Invalid login or password";
+        }
+    }
+
+    private async Task<User> CheckUserExists(string login, string password)
+    {
+        var users = await CsvLoader.ReadData<User>("users.csv");
+        return users.FirstOrDefault(u => u.Login == login && u.Password == password);
+    }
+}

@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "ND7DS4VRyt36K1FHbe8C8nOrfLRXYTiF2ZnYfFeggJpp6oBTvZmA+JI+QFfffzdU1rJH7nUy0hI1MWhpU7+VYQ==",
+  "success": true,
+  "projectFilePath": "/home/runner/Zhiostkaia-viorstka-saita/BlazorApp/BlazorApp.csproj",
+  "expectedPackageFiles": [
+    "/home/runner/.nuget/packages/csvhelper/27.1.1/csvhelper.27.1.1.nupkg.sha512"
+  ],
+  "logs": []
+}

@@ -1,0 +1,14 @@
+/* _content/BlazorApp/Shared/MainLayout.razor.rz.scp.css */
+/* Тут начинаются мои уже добавленные стили */ 
+/* оно не работает */
+  .btn[b-3ij3p7wwc4] {
+    background-color: #F5E2D8;
+    border-color: #E4717A;
+    border-radius: 9.86px;
+    margin: 0 10px; /* Adjust the margin as needed */
+}
+  .company-font[b-3ij3p7wwc4] {
+      font-family: 'Roboto Mono', sans-serif;
+      font-weight: 300;
+      font-size: 64px; /* You can adjust size as needed */
+  }

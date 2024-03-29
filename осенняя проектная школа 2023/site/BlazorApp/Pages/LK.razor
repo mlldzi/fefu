@@ -1,0 +1,187 @@
+@page "/LK"
+@inject NavigationManager NavigationManager
+@inject Services.AppData AppData
+
+<style>
+body {
+  background-color: #525252;
+}
+.top-bar {
+    height: 0%;
+    width: 100%;
+    background-color: #333; /* Choose your desired color */
+    position: fixed;
+    top: 0;
+    left: 0;
+}
+</style>
+@if (isEditMode)
+{
+    <style>
+        ::placeholder {
+            color: black;
+            opacity: 1; /* Firefox */
+        }
+    </style>
+
+<div class="profile-editor" style="max-width: 100%; margin: auto; background-color: #f9f9f9; border-radius: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); padding: 20px; text-align: center;">
+    <EditForm Model="@this">
+<InputFile OnChange="UploadProfilePicture" style="margin-bottom: 20px; width: 100%;" />
+
+        <InputText @bind-Value="@name" placeholder="Enter your name" style="display: block; margin-bottom: 20px; color: black; width: 100%;" />
+        <InputText @bind-Value="@surname" placeholder="Enter your surname" style="display: block; margin-bottom: 20px; color: black; width: 100%;" />
+        <InputNumber @bind-Value="@age" style="display: block; margin-bottom: 20px; color: black; width: 100%;" />
+        <InputText @bind-Value="@city" placeholder="Enter your city" style="display: block; margin-bottom: 20px; color: black; width: 100%;" />
+        <div style="margin-top: 10px;">
+            <label for="genderSelect" style="display: block; margin-bottom: 5px;">Gender</label>
+            <select id="genderSelect" @bind="gender" style="border-radius: 20px; margin: 0 auto; display: block; width: 100%; color: black;">
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+            </select>
+        </div>
+          
+        <h3 style="margin-top: 20px; text-align: left; color: black;">Hobbies</h3>
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; margin-bottom: 20px;">
+            @foreach (var hobbyEntry in hobbyMap)
+            {               
+                <div>
+                    <input type="checkbox" @onchange="(() => ToggleHobby(hobbyEntry.Key.ToString()))" id="@hobbyEntry.Value" checked="@hobbies.Contains(hobbyEntry.Key.ToString())" />
+                    <label for="@hobbyEntry.Value" style="color: black; @(hobbies.Contains(hobbyEntry.Key.ToString()) ? "background-color: white;" : "")">@hobbyEntry.Value</label>
+                </div>
+            }
+        </div>
+    </EditForm>
+    <button @onclick="SaveProfile" style="border-radius: 5px; background-color: #424242; border-color: white; color: white; width: 100%; padding: 10px 20px; margin-top: 20px;">Save</button>
+</div>
+}
+else
+{
+    <div class="profile-card" style="max-width: 300px; margin: auto; background-color: #424242; border-radius: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); padding: 20px; text-align: center;">
+        <img src="@profilePictureUrl" style="width: 100px; height: 100px; border-radius: 50%; margin-bottom: 20px;" />
+        <h2 style="color: #F5F5DC;">@name @surname</h2>
+        <p style="color: #F5F5DC;">Age: @age</p>
+        <p style="color: #F5F5DC;">City: @city</p>
+        <p style="color: #F5F5DC;">Gender: @gender</p>
+        <p style="color: #F5F5DC;">Telegram: @telegram</p>
+        <div>
+            <h3 style="color: #F5F5DC;">Hobbies:</h3>
+            @foreach (var hobby in hobbies)
+            {
+                <span style="display: inline-block; background-color: #e0e0e0; border-radius: 25px; padding: 5px 10px; margin: 5px;">@hobby</span>
+            }
+        </div>
+        <button @onclick="(() => isEditMode = true)" style="border-radius: 5px; background-color: #525252; border-color: white; color: white; padding: 10px 20px; margin-top: 20px;">Edit</button>
+    <button @onclick="Search" style="border-radius: 5px; background-color: #525252; border-color: white; color: white; padding: 10px 20px; margin-top: 20px;">Search</button>
+    <button @onclick="Logout" style="border-radius: 5px; background-color: #525252; border-color: white; color: white; padding: 10px 20px; margin-top: 20px;">Logout</button>
+    </div>
+}
+
+@code {
+    private string name;
+    private string surname;
+    private int age;
+    private string city;
+    private string gender;
+    private string telegram;
+    private string profilePictureUrl;
+    private List<string> hobbies;
+    private Dictionary<Hobby, string> hobbyMap = new()
+    {
+        { Hobby.Football, "Football" },
+        { Hobby.Hockey, "Hockey" },
+        { Hobby.Snowboarding, "Snowboarding" },
+        { Hobby.Anime, "Anime" },
+        { Hobby.GuitarPlaying, "Guitar Playing" },
+        { Hobby.Startups, "Startups" },
+        { Hobby.Cooking, "Cooking" },
+        { Hobby.Fishing, "Fishing" },
+        { Hobby.BoardGames, "Board Games" },
+        { Hobby.DungeonsAndDragons, "DnD" }, // Changed to match display name
+        { Hobby.Cars, "Cars" },
+        { Hobby.HandAndCrafts, "Handcrafts" },
+        { Hobby.Dancing, "Dancing" },
+        { Hobby.Hunting, "Hunting" },
+        { Hobby.Tourism, "Tourism" },
+        { Hobby.Drawing, "Drawing" },
+        { Hobby.Music, "Music" },
+        { Hobby.HobbyHorsing, "Hobby Horsing" }, // Changed to match display name
+        { Hobby.Blogging, "Blogging" },
+        { Hobby.Shows, "Shows" },
+        { Hobby.Movies, "Movies" },
+        { Hobby.Reading, "Reading" },
+        { Hobby.GraphicDesign, "Graphic Design" },
+        { Hobby.Photography, "Photography" },
+        { Hobby.ElectronicsAndRobotics, "Tech" }, // Changed to match display name
+        { Hobby.Alcohol, "Brewing" },
+        { Hobby.Parkour, "Parkour" },
+        { Hobby.Fencing, "Fencing" },
+        { Hobby.Yoga, "Yoga" },
+        { Hobby.HorseRiding, "Horse Riding" }
+    };
+    protected override void OnInitialized()
+    {
+        if (AppData.CurrentUser == null) return;
+        profilePictureUrl = "assets/ICONS/" + AppData.CurrentUser.Login + ".png";
+        string fullName = AppData.CurrentUser.Name;
+        name = fullName.Split(" ")[0];
+        surname = fullName.Split(" ")[1];
+        age = AppData.CurrentUser.Age;
+        city = AppData.CurrentUser.Location;
+        gender = AppData.CurrentUser.Gender;
+        telegram = AppData.CurrentUser.Telegram;
+        hobbies = AppData.CurrentUser.MainHobbies.Split(",").ToList();
+    }
+    private void Logout()
+    {
+        NavigationManager.NavigateTo("/");
+    }
+    private void Search()
+    {
+        NavigationManager.NavigateTo("/search");
+    }
+
+    bool isEditMode = false;
+
+    private void EditProfile() =>
+        isEditMode = true;
+
+    private void SaveProfile()
+    {
+        AppData.CurrentUser.Name = name + " " + surname;
+        AppData.CurrentUser.Age = age;
+        AppData.CurrentUser.Location = city;
+        AppData.CurrentUser.Gender = gender;
+        AppData.CurrentUser.Telegram = telegram;
+        //AppData.CurrentUser.MainHobbies = string.Join(",")
+        isEditMode = false;
+    }
+
+    private void ToggleHobby(string hobby)
+    {
+        if (hobbies.Contains(hobby))
+        {
+            hobbies.Remove(hobby);
+        }
+        else
+        {
+            hobbies.Add(hobby);
+        }
+    }
+
+    private async Task UploadProfilePicture(InputFileChangeEventArgs e)
+    {
+        var imageFile = e.File;
+        if (imageFile != null)
+        {
+            var username = AppData.CurrentUser.Login;
+            var newFileName = $"{username}.png";
+            var uploadPath = Path.Combine("wwwroot", "assets", "ICONS", newFileName);
+            using (var stream = imageFile.OpenReadStream())
+            using (var fileStream = new FileStream(uploadPath, FileMode.Create))
+            {
+                await stream.CopyToAsync(fileStream);
+                profilePictureUrl = $"assets/{newFileName}"; // Update the displayed image
+            }
+        }
+    }
+}

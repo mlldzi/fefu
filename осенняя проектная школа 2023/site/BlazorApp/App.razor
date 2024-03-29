@@ -1,0 +1,11 @@
+<Router AppAssembly="@typeof(Program).Assembly" PreferExactMatches="@true"> 
+    <Found Context="routeData">
+        <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
+    </Found>
+    <NotFound>
+        <LayoutView Layout="@typeof(MainLayout)">
+						<h1>Uh oh...</h1>
+            <p><span class="font-weight-bold">That's a 404.</span> Let's <a href>head back home.</a></p>
+        </LayoutView>
+    </NotFound>
+</Router>

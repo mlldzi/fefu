@@ -1,0 +1,231 @@
+@page "/registration"
+@inject NavigationManager NavigationManager
+@inject Services.AppData AppData
+
+<style>
+    .hobby-label {
+        width: 20%;
+        padding: 5px;
+        display: flex;
+        align-items: center;
+        justify-content: start;
+    }
+    .hobby-checkbox {
+        margin-right: .5rem;
+    }
+body 
+{
+  background-color: #525252;
+}
+.top-bar {
+    height: 0%;
+    width: 100%;
+    background-color: #333; /* Choose your desired color */
+    position: fixed;
+    top: 0;
+    left: 0;
+}
+</style>
+<div class="top-bar">
+    <img src="assets/logo.jpg" style="height: 100%;">
+</div>
+
+@if (!isRegistered)
+{
+<style>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700;900&display=swap" rel="stylesheet">
+  .custom-font {
+      font-family: 'Roboto', sans-serif;
+      font-weight: 400; /* Adjust the weight as needed */
+  }
+</style>
+
+<div class="d-flex flex-column align-items-center justify-content-center custom-font" style="height: 90vh;">
+    <div class="text-center mb-5">
+        @if (step == 1)
+ {
+<h1 style="text-align: center;color: #f2f2f2; font-size: 70px;"><strong>Step 1</strong></h1>
+<div style="display: flex; flex-direction: column;">
+    <input type="text" @bind="user.Login" placeholder="Username" style="text-align: center; margin-bottom: 15px; border-radius: 20px; font-size: 150%; border: 5px solid;" />
+    <input type="password" @bind="user.Password" placeholder="Password" style="text-align: center; margin-bottom: 15px; border-radius: 20px; font-size: 150%; border: 5px solid;" />
+</div>
+
+@if (!string.IsNullOrEmpty(errorPassword))
+{
+    <div class="error-message">
+        <span>@errorPassword</span>
+    </div>
+}
+<button @onclick="GoBack" style="text-align: center; display: inline-block; border-radius: 90.56px; background-color: #F5E2D8; border-color: white; font-size: 150%">Back</button>
+<button @onclick="NextStep" style="text-align: center; display: inline-block; margin-left: 10px; border-radius: 90.56px; background-color: #F5E2D8; border-color: white; font-size: 150%">Next</button>
+}
+            else if (step == 2)
+           {
+    <h1 style="text-align: center; font-family: 'Open Sans', sans-serif; font-weight: 700; color: #f2f2f2; font-size: 60px;"><strong>Step 2</strong></h1>
+    <input type="text" @bind="name" placeholder="Name" style="display: block; margin: 0 auto; text-align: center; margin-bottom: 15px; border-radius: 20px; border: 5px solid; font-size: 150%;" />
+    <input type="text" @bind="surname" placeholder="Surname" style="display: block; margin: 0 auto; text-align: center; margin-bottom: 15px; border-radius: 20px; border: 5px solid; font-size: 150%;" />
+    <div style="display: flex; flex-direction: column; align-items: center; width: 100%;">
+        <div style="display: flex; justify-content: space-between; width: 50%; margin-bottom: 15px;">
+        <select @onchange="UpdateGender" style="border-radius: 20px; border: 5px solid; font-size: 150%; width: 290px; margin-right: 10px;">
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+        </select>
+            <input type="number" @bind="user.Age" min="0" max="120" placeholder="Age" style="text-align: center; border-radius: 20px; border: 5px solid; font-size: 150%; width: 290px;" />
+        </div>
+    </div>
+    <input type="text" @bind="user.Telegram" placeholder="Telegram Tag" style="text-align: center; margin-bottom: 15px; border-radius: 20px; border: 5px solid; font-size: 150%; display: block; margin-left: auto; margin-right: auto;" />
+    <input type="text" @bind="user.Location" placeholder="City" style="text-align: center; margin-bottom: 15px; border-radius: 20px; border: 5px solid; font-size: 150%; display: block; margin-left: auto; margin-right: auto;" />
+    <button @onclick="PreviousStep" style="text-align: center; display: inline-block; margin-right:10px; border-radius: 90.56px; background-color: #F5E2D8; border: 5px solid white; font-size: 150%">Back</button>
+    <button @onclick="NextStep" style="text-align: center; display: inline-block; margin-bottom: 5px; border-radius: 90.56px; background-color: #F5E2D8; border: 5px solid white; font-size: 150%">Next</button>
+}
+            else if (step == 3)
+            {
+                <h1 style="text-align: center;font-family: 'Roboto Mono', sans-serif;font-weight: 700; color: #f2f2f2; font-size: 80px;"><strong>Step 3: Choose your hobbies</strong></h1>
+<div style="text-align: center; margin-bottom: 15px; display: flex; flex-wrap: wrap; justify-content: center; align-items: center; font-size: 150%; background-color: #f0f0f0; padding: 10px; border-radius: 10px; width: 80%; margin-left: auto; margin-right: auto;">
+    @for(var i = 1; i <= 30; i++)
+    {
+    var hobby = (Hobby)i;
+    <label class="hobby-label" style="font-family: 'Roboto', sans-serif; font-weight: 400;">
+        <input type="checkbox" class="hobby-checkbox" @bind="selectedHobbies[hobby]" />
+        @HobbyToEnglish[hobby]
+    </label>
+
+    }
+</div>
+    <button @onclick="PreviousStep" style="text-align: center;display: inline-block; margin-right:10px; border-radius: 90.56px; background-color: #F5E2D8; border-color: white; font-size: 150%">Back</button>
+    <button @onclick="CompleteRegistration" style="text-align: center;display: inline-block; margin-bottom: 5px; border-radius: 90.56px; background-color: #F5E2D8; border-color: white; font-size: 150%">Complete Registration</button>
+            }
+        </div>
+    </div>
+}
+else{
+    <h1 style="text-align: center; font-weight: bold; font-family: 'Roboto', sans-serif;">Registration Successful</h1>
+}
+<style>
+    .error {
+        border-color: red;
+    }
+   .error-message {
+       display: flex;
+       align-items: center;
+       white-space: nowrap;
+       color: red;
+       margin-bottom: 10px;
+   }
+</style>
+
+@code {
+    private bool isRegistered = false;
+    private string errorPassword;
+    private string name;
+    private string surname;
+    private User user = new();
+    private int step = 1;
+    private Dictionary<Hobby, bool> selectedHobbies = Enum.GetValues(typeof(Hobby)).Cast<Hobby>().ToDictionary(hobby => hobby, hobby => false);
+
+    public static readonly Dictionary<Hobby, string> HobbyToEnglish = new Dictionary<Hobby, string>
+    {
+        { Hobby.Football, "Football" },
+        { Hobby.Hockey, "Hockey" },
+        { Hobby.Snowboarding, "Snowboarding" },
+        { Hobby.Anime, "Anime" },
+        { Hobby.GuitarPlaying, "Guitar Playing" },
+        { Hobby.Startups, "Startups" },
+        { Hobby.Cooking, "Cooking" },
+        { Hobby.Fishing, "Fishing" },
+        { Hobby.BoardGames, "Board Games" },
+        { Hobby.DungeonsAndDragons, "DND" },
+        { Hobby.Cars, "Cars" },
+        { Hobby.HandAndCrafts, "Handcrafts" },
+        { Hobby.Dancing, "Dancing" },
+        { Hobby.Hunting, "Hunting" },
+        { Hobby.Tourism, "Tourism" },
+        { Hobby.Drawing, "Drawing" },
+        { Hobby.Music, "Music" },
+        { Hobby.HobbyHorsing, "Hobby Horsing" },
+        { Hobby.Blogging, "Blogging" },
+        { Hobby.Shows, "Shows" },
+        { Hobby.Movies, "Movies" },
+        { Hobby.Reading, "Reading" },
+        { Hobby.GraphicDesign, "Graphic Design" },
+        { Hobby.Photography, "Photography" },
+        { Hobby.ElectronicsAndRobotics, "Tech" },
+        { Hobby.Alcohol, "Brewing" },
+        { Hobby.Parkour, "Parkour" },
+        { Hobby.Fencing, "Fencing" },
+        { Hobby.Yoga, "Yoga" },
+        { Hobby.HorseRiding, "Horse Riding" }
+    };
+
+    protected override void OnInitialized()
+    {
+        SetDefaultGender();
+        foreach (Hobby hobby in Enum.GetValues(typeof(Hobby)))
+        {
+            selectedHobbies[hobby] = false;
+        }
+        base.OnInitialized();
+    }
+
+
+    private void NextStep()
+    {
+        if (step == 1)
+        {
+            if (string.IsNullOrEmpty(user.Login) || string.IsNullOrEmpty(user.Password))
+            {
+                errorPassword = "Please fill in both the login and password fields.";
+            }
+            else
+            {
+                errorPassword = null;
+                step++;
+            }
+        }
+
+
+        else if (step == 3)
+        {
+            CompleteRegistration();
+        }
+        else
+        {
+            step++;
+        }
+    }
+    
+    private void PreviousStep()
+    {
+        if (step > 1)
+        {
+            step--;
+        }
+    }
+
+    private void CompleteRegistration()
+    {
+        user.Name = name + " " + surname;
+        user.MainHobbies = string.Join(",", selectedHobbies.Where(h => h.Value).Select(h => h.Key).ToList());
+        CsvLoader.AppendData("users.csv", user);
+        AppData.CurrentUser = user;
+
+        NavigationManager.NavigateTo("/LK");
+    }
+
+    private void GoBack() => NavigationManager.NavigateTo("/");
+
+    private string GetInputErrorClass()
+    {
+        return !string.IsNullOrEmpty(errorPassword) ? "error" : "";
+    }
+
+    private void UpdateGender(ChangeEventArgs e)
+    {
+        user.Gender = e.Value.ToString();
+    }
+
+    private void SetDefaultGender()
+    {
+        user.Gender = "Male";
+    }
+}
